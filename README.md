@@ -61,6 +61,7 @@ Cities included in this game:
 1. Install [Node.js](https://nodejs.org/) and npm.
 2. Install [Docker](https://www.docker.com/).
 3. A Google Cloud Project with Maps API enabled.
+4. Install [gcloud CLI](https://cloud.google.com/sdk/docs/install)
 
 ### Clone the Repository
 ```bash
@@ -87,6 +88,7 @@ This project uses a `.env` file to securely store API keys. Create a `.env` file
 
 ```env
 GOOGLE_MAPS_API_KEY=your-google-maps-api-key
+SIGNING_SECRET=your-google-digital-signature-key
 ```
 
 > Note: The `GOOGLE_MAPS_API_KEY` should have HTTP referrer restrictions to secure it.
@@ -157,7 +159,7 @@ GOOGLE_MAPS_API_KEY=your-google-maps-api-key
 1. The game fetches 10 random valid Street View locations using Google Maps and Street View APIs.
 2. Players view the locations and decide if trash is visible by clicking **Yes** or **No**.
 3. A score is tracked across 10 rounds.
-4. At the end, the game displays the player’s score along with an awareness-raising YouTube video.
+4. At the end, the game displays the player’s score along with our [YouTube video](https://www.youtube.com/watch?v=N-PI1VquHDs), raising awareness for a demand on Cleaner Cities.
 
 ---
 
