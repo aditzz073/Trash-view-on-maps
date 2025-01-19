@@ -159,7 +159,7 @@ SIGNING_SECRET=your-google-digital-signature-key
 1. The game fetches 10 random valid Street View locations using Google Maps and Street View APIs.
 2. Players view the locations and decide if trash is visible by clicking **Yes** or **No**.
 3. A score is tracked across 10 rounds.
-4. At the end, the game displays the player’s score along with our [YouTube video](https://www.youtube.com/watch?v=N-PI1VquHDs), raising awareness for a demand on Cleaner Cities.
+4. At the end, the game displays the player’s score along with our [YouTube video](https://www.youtube.com/watch?v=Be-QX2fkb30), raising awareness for a demand on Cleaner Cities.
 
 ---
 
