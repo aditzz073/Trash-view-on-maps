@@ -1,20 +1,18 @@
 # Node.js dependencies
-node_modules/
+server/node_modules/
+proxy/node_modules/
 
 # Environment variables
-.env
+proxy/.env
 
 # Logs
-*.log
+server/*.log
+proxy/*.log
 
 # Docker
-*.dockerignore
-Dockerfile.local
+proxy/*.dockerignore
+server/*.dockerignore
 
 # Build/Generated files
-dist/
-build/
-
-# OS-specific files
-.DS_Store
-Thumbs.db
+proxy/dist/
+server/build/

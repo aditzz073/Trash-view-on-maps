@@ -1,39 +1,29 @@
 require("dotenv").config();
 const express = require("express");
 const path = require("path");
-const crypto = require("crypto");
 const fetch = (...args) =>
-  import("node-fetch").then(({ default: fetch }) => fetch(...args)); // Use dynamic import for node-fetch
+  import("node-fetch").then(({ default: fetch }) => fetch(...args));
 
 const app = express();
-
-// Function to generate signed URLs
-function generateSignedUrl(path, secret) {
-  const decodedSecret = Buffer.from(secret, "base64");
-  const signature = crypto
-    .createHmac("sha1", decodedSecret)
-    .update(path)
-    .digest("base64")
-    .replace(/\+/g, "-")
-    .replace(/\//g, "_");
-  return `${path}&signature=${signature}`;
-}
 
 // Serve static files
 app.use(express.static(path.join(__dirname, "public")));
 
-// Serve the Google Maps API script with signed URLs
-app.get("/api/maps", (req, res) => {
-  const basePath = "/maps/api/js";
-  const params = `key=${process.env.GOOGLE_MAPS_API_KEY}&callback=${req.query.callback || "initializeMap"}`;
-  const signedUrl = generateSignedUrl(`${basePath}?${params}`, process.env.SIGNING_SECRET);
-
-  res.type("application/javascript").send(`
-    const script = document.createElement('script');
-    script.src = "https://maps.googleapis.com${signedUrl}";
-    document.body.appendChild(script);
-  `);
+// Serve the Google Maps API script via proxy
+app.get("/api/maps", async (req, res) => {
+  try {
+    const callback = req.query.callback || "initializeMap";
+    const response = await fetch(
+      `https://proxy-server-262296533857.asia-south1.run.app/proxy/maps?callback=${callback}`
+    );
+    const script = await response.text();
+    res.type("application/javascript").send(script);
+  } catch (error) {
+    console.error("Error fetching Maps API script via proxy:", error);
+    res.status(500).send("Internal server error.");
+  }
 });
+
 
 // API endpoint for getting 10 random valid Street View points
 app.get("/api/streetview", async (req, res) => {
@@ -54,17 +44,14 @@ app.get("/api/streetview", async (req, res) => {
     const city = CITY_BOUNDS[Math.floor(Math.random() * CITY_BOUNDS.length)];
     const lat = Math.random() * (city.max_lat - city.min_lat) + city.min_lat;
     const lon = Math.random() * (city.max_lon - city.min_lon) + city.min_lon;
-    console.log(`Generated coordinates for ${city.name}: { lat: ${lat}, lon: ${lon} }`);
     return { lat, lon, city: city.name };
   }
 
   async function validateStreetView(lat, lon) {
-    const basePath = "/maps/api/streetview/metadata";
-    const params = `location=${lat},${lon}&key=${process.env.GOOGLE_MAPS_API_KEY}`;
-    const signedUrl = generateSignedUrl(`${basePath}?${params}`, process.env.SIGNING_SECRET);
-
     try {
-      const response = await fetch(`https://maps.googleapis.com${signedUrl}`);
+      const response = await fetch(
+        `https://proxy-server-262296533857.asia-south1.run.app/proxy/streetview?location=${lat},${lon}`
+      );
       const data = await response.json();
       // Only fetch images where Street View exists and verified by Google
       return data.status === "OK" && data.copyright === "© Google";
@@ -82,11 +69,8 @@ app.get("/api/streetview", async (req, res) => {
       const coords = getRandomCoordinates();
       const isValid = await validateStreetView(coords.lat, coords.lon);
       if (isValid) {
-        console.log(`Valid coordinates added: ${JSON.stringify(coords)}`);
         points.push(coords);
-      } else {
-        console.log(`No Street View available for: ${JSON.stringify(coords)}`);
-      }
+      } 
     }
 
     return points;
