@@ -9,6 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Adding audio feedback to button presses.
 - Improved UI for mobile.
 
+## [1.2.0] - 2025-01-21
+### Added
+- Proxy server for better security of API keys and Digital Signature.
+
+### Changed
+- Removed unnecessary logging for improving efficiency in production.
+
 ## [1.1.0] - 2025-01-17
 ### Added
 - Added favicon support.

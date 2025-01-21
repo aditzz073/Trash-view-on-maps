@@ -6,6 +6,9 @@ const fetch = (...args) =>
 
 const app = express();
 
+// Replace this with localhost URL for running locally
+const proxyURL = "https://proxy-server-262296533857.asia-south1.run.app"
+
 // Serve static files
 app.use(express.static(path.join(__dirname, "public")));
 
@@ -14,7 +17,7 @@ app.get("/api/maps", async (req, res) => {
   try {
     const callback = req.query.callback || "initializeMap";
     const response = await fetch(
-      `https://proxy-server-262296533857.asia-south1.run.app/proxy/maps?callback=${callback}`
+      `${proxyURL}/proxy/maps?callback=${callback}`
     );
     const script = await response.text();
     res.type("application/javascript").send(script);
@@ -50,7 +53,7 @@ app.get("/api/streetview", async (req, res) => {
   async function validateStreetView(lat, lon) {
     try {
       const response = await fetch(
-        `https://proxy-server-262296533857.asia-south1.run.app/proxy/streetview?location=${lat},${lon}`
+        `${proxyURL}/proxy/streetview?location=${lat},${lon}`
       );
       const data = await response.json();
       // Only fetch images where Street View exists and verified by Google
