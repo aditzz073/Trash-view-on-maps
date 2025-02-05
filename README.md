@@ -139,8 +139,8 @@ SIGNING_SECRET=your-google-digital-signature-key
      --region=asia-south1 \
      --platform=managed \
      --allow-unauthenticated
-     --set-env-vars GOOGLE_MAPS_API_KEY=AIzaSyBW8u-4mYqMtU6if52ECi7rNO4_B_TvbWk
-     --set-env-vars SIGNING_SECRET=uwsd2zpXs7UoMy_nLOVzO1E4JJA=
+     --set-env-vars GOOGLE_MAPS_API_KEY=<your-api-key>
+     --set-env-vars SIGNING_SECRET=<your-signing-secret>
    ```
 
 
