@@ -1,14 +1,16 @@
 {
-  "name": "proxy",
+  "name": "trash-detection-proxy",
   "version": "1.0.0",
+  "description": "Proxy server for Google Maps API integration",
   "main": "proxy.js",
   "scripts": {
+    "start": "node proxy.js",
+    "dev": "node proxy.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
+  "keywords": ["proxy", "google-maps", "api"],
+  "author": "aditzz073",
+  "license": "MIT",
   "dependencies": {
     "dotenv": "^16.4.7",
     "express": "^4.21.2",

@@ -1,18 +1,19 @@
 {
-  "name": "trash-detection-game",
+  "name": "trash-detection-server",
   "version": "1.0.0",
+  "description": "Express server for trash detection game",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
+    "start": "node server.js",
+    "dev": "node server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": ["trash-detection", "express", "server"],
+  "author": "aditzz073",
+  "license": "MIT",
   "dependencies": {
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "node-fetch": "^3.3.2"
-  },
-  "description": ""
+  }
 }

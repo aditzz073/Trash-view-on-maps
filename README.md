@@ -66,8 +66,8 @@ Cities included in this game:
 
 ### Clone the Repository
 ```bash
-git clone https://github.com/your-username/trash-detection-game.git
-cd trash-detection-game
+git clone https://github.com/aditzz073/Trash-view-on-maps.git
+cd Trash-view-on-maps
 ```
 
 ### Install Dependencies
@@ -75,28 +75,69 @@ cd trash-detection-game
 npm install
 ```
 
+### Setup Environment Variables (See Environment Variables section below)
+
 ### Run Locally
+
+**Option 1: Start both servers with one command**
 ```bash
-node proxy.js
-node server.js
+npm run dev
 ```
 
-> Note: Update the localhost proxy address (http://localhost:3000) in the script.js for running the proxy server locally.
+**Option 2: Start servers separately**
+```bash
+# Terminal 1 - Start proxy server
+npm run start:proxy
 
+# Terminal 2 - Start main server  
+npm run start:server
+```
+
+### Access the Game
 Visit `http://localhost:3001` in your browser to access the game.
 
 ---
 
 ## **Environment Variables**
 
-This project uses a `.env` file to securely store API keys. Create a `.env` file in the proxy server directory with the following keys:
+This project uses `.env` files to securely store API keys. **NEVER commit your actual API keys to git!**
 
-```env
-GOOGLE_MAPS_API_KEY=your-google-maps-api-key
-SIGNING_SECRET=your-google-digital-signature-key
-```
+### Setup Environment Variables
 
-> Note: The `GOOGLE_MAPS_API_KEY` should have HTTP referrer restrictions to secure it.
+1. **Copy the example files:**
+   ```bash
+   cp .env.example .env
+   cp server/.env.example server/.env
+   cp proxy/.env.example proxy/.env
+   ```
+
+2. **Get your Google Maps API Key:**
+   - Go to [Google Cloud Console](https://console.cloud.google.com/apis/credentials)
+   - Create a new API key or use an existing one
+   - Enable these APIs:
+     - Maps JavaScript API
+     - Street View Static API
+   - **IMPORTANT**: Set API key restrictions:
+     - Application restrictions: HTTP referrers
+     - Add your domain(s): `yourdomain.com/*`, `localhost:*` (for development)
+
+3. **Update your `.env` files with your actual keys:**
+   ```env
+   # Replace with your actual Google Maps API key
+   GOOGLE_MAPS_API_KEY=your-actual-google-maps-api-key-here
+   SIGNING_SECRET=your-optional-signing-secret-here
+   PROXY_URL=http://localhost:3000
+   ```
+
+### Security Best Practices
+- ✅ **DO**: Store API keys in `.env` files (already gitignored)
+- ✅ **DO**: Set API key restrictions in Google Cloud Console
+- ✅ **DO**: Use different API keys for development and production
+- ❌ **DON'T**: Commit `.env` files with real keys to git
+- ❌ **DON'T**: Share API keys in public forums or code
+- ❌ **DON'T**: Use unrestricted API keys
+
+> **Note**: The `.env` files are already included in `.gitignore` to prevent accidental commits.
 
 ---
 

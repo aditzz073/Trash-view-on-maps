@@ -7,7 +7,7 @@ const fetch = (...args) =>
 const app = express();
 
 // Replace this with localhost URL for running locally
-const proxyURL = "https://proxy-server-262296533857.asia-south1.run.app"
+const proxyURL = process.env.PROXY_URL || "http://localhost:3000";
 
 // Serve static files
 app.use(express.static(path.join(__dirname, "public")));

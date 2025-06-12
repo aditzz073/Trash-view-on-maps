@@ -1,0 +1,38 @@
+{
+  "name": "trash-view-on-maps",
+  "version": "1.0.0",
+  "description": "Interactive game to find trash in Indian cities using Google Maps Street View",
+  "main": "index.js",
+  "scripts": {
+    "install-all": "npm install",
+    "start": "cd server && npm start",
+    "start:server": "cd server && npm start",
+    "start:proxy": "cd proxy && npm start",
+    "dev": "concurrently \"npm run start:proxy\" \"npm run start:server\"",
+    "clean": "rm -rf node_modules server/node_modules proxy/node_modules",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "trash-detection",
+    "game",
+    "google-maps",
+    "street-view",
+    "environmental-awareness",
+    "india",
+    "cities",
+    "cleanliness"
+  ],
+  "author": "aditzz073",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/aditzz073/Trash-view-on-maps.git"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "workspaces": [
+    "server",
+    "proxy"
+  ]
+}

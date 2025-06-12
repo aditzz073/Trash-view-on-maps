@@ -75,6 +75,11 @@ app.get("/proxy/maps", (req, res) => {
     });
 });
 
+// Health check endpoint
+app.get("/health", (req, res) => {
+  res.status(200).json({ status: "OK", message: "Proxy server is running" });
+});
+
 // Start the server and listen on the specified port
 app.listen(PORT, () => {
   console.log(`Proxy server running on port ${PORT}`);
