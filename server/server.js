@@ -27,7 +27,6 @@ app.get("/api/maps", async (req, res) => {
   }
 });
 
-
 // API endpoint for getting 10 random valid Street View points
 app.get("/api/streetview", async (req, res) => {
   const CITY_BOUNDS = [
@@ -51,15 +50,29 @@ app.get("/api/streetview", async (req, res) => {
   }
 
   async function validateStreetView(lat, lon) {
+    console.log(`🔍 Validating Street View for: ${lat}, ${lon}`);
+    
     try {
       const response = await fetch(
         `${proxyURL}/proxy/streetview?location=${lat},${lon}`
       );
+      
+      console.log(`📊 Response status: ${response.status}`);
+      
+      if (!response.ok) {
+        console.log(`❌ API Response not OK: ${response.status} ${response.statusText}`);
+        return false;
+      }
+
       const data = await response.json();
+      console.log(`📋 API Response data:`, JSON.stringify(data, null, 2));
+      
       // Only fetch images where Street View exists and verified by Google
-      return data.status === "OK" && data.copyright === "© Google";
+      const isValid = data.status === "OK" && data.copyright === "© Google";
+      console.log(`✅ Is valid: ${isValid}`);
+      return isValid;
     } catch (error) {
-      console.error("Error validating Street View:", error);
+      console.error("❌ Error validating Street View:", error);
       return false;
     }
   }
@@ -67,13 +80,49 @@ app.get("/api/streetview", async (req, res) => {
   async function getStreetViewPoints() {
     const points = [];
     const maxPoints = 10;
+    const maxAttempts = 20; // Prevent infinite loops
 
-    while (points.length < maxPoints) {
+    // Fallback coordinates in case proxy server fails or no valid points found
+    const fallbackCoords = [
+      { lat: 28.6139, lon: 77.2090, city: "Delhi" },
+      { lat: 19.0760, lon: 72.8777, city: "Mumbai" },
+      { lat: 12.9716, lon: 77.5946, city: "Bangalore" },
+      { lat: 22.5726, lon: 88.3639, city: "Kolkata" },
+      { lat: 13.0827, lon: 80.2707, city: "Chennai" },
+      { lat: 17.3850, lon: 78.4867, city: "Hyderabad" },
+      { lat: 18.5204, lon: 73.8567, city: "Pune" },
+      { lat: 23.0225, lon: 72.5714, city: "Ahmedabad" },
+      { lat: 26.9124, lon: 75.7873, city: "Jaipur" },
+      { lat: 26.8467, lon: 80.9462, city: "Lucknow" }
+    ];
+
+    // Check if proxy server is accessible
+    try {
+      const testResponse = await fetch(`${proxyURL}/health`, { timeout: 5000 });
+      if (!testResponse.ok) {
+        console.log("⚠️  Proxy server not accessible, using fallback coordinates");
+        return fallbackCoords.slice(0, maxPoints);
+      }
+    } catch (error) {
+      console.log("⚠️  Proxy server error, using fallback coordinates:", error.message);
+      return fallbackCoords.slice(0, maxPoints);
+    }
+
+    let attempts = 0;
+    while (points.length < maxPoints && attempts < maxAttempts) {
+      attempts++;
       const coords = getRandomCoordinates();
       const isValid = await validateStreetView(coords.lat, coords.lon);
       if (isValid) {
         points.push(coords);
-      } 
+      } else {
+        console.log(`No Street View available for: ${JSON.stringify(coords)} (attempt ${attempts})`);
+      }
+    }
+
+    if (points.length === 0) {
+      console.log("⚠️  No valid points found, using fallback coordinates");
+      return fallbackCoords.slice(0, 5);
     }
 
     return points;
