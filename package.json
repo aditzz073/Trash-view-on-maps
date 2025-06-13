@@ -9,6 +9,7 @@
     "start:server": "cd server && npm start",
     "start:proxy": "cd proxy && npm start",
     "dev": "concurrently \"npm run start:proxy\" \"npm run start:server\"",
+    "build": "cd server && npm install && cd ../proxy && npm install",
     "clean": "rm -rf node_modules server/node_modules proxy/node_modules",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
