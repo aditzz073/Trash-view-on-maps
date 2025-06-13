@@ -65,12 +65,7 @@ async function startGame() {
       startButton.disabled = false;
       startButton.textContent = "START GAME";
 
-      // More helpful error message
-      if (error.message && error.message.includes('fetch')) {
-        alert("Unable to connect to game servers. Please ensure both the proxy and main servers are running:\n\n1. Run 'npm run dev' to start both servers\n2. Or start them separately:\n   - npm run start:proxy\n   - npm run start:server");
-      } else {
-        alert("Error starting the game. Please try again later.");
-      }
+      alert("Error starting the game. Please try again later.");
     }
   });
 }
