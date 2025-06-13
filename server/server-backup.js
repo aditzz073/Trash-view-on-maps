@@ -11,6 +11,11 @@ const app = express();
 const API_KEY = process.env.GOOGLE_MAPS_API_KEY;
 const SIGNING_SECRET = process.env.SIGNING_SECRET;
 
+// In Vercel, use relative URLs; locally use localhost
+const proxyURL = process.env.VERCEL_URL 
+  ? `https://${process.env.VERCEL_URL}` 
+  : (process.env.PROXY_URL || "http://localhost:3000");
+
 // Function to generate signed URLs
 function generateSignedUrl(path, secret) {
   if (!secret) {
@@ -33,11 +38,6 @@ function generateSignedUrl(path, secret) {
 
 // Serve static files
 app.use(express.static(path.join(__dirname, "public")));
-
-// Health check endpoint
-app.get("/health", (req, res) => {
-  res.status(200).json({ status: "OK", message: "Server is running" });
-});
 
 // Proxy endpoint for the Street View Static API
 app.get("/proxy/streetview", async (req, res) => {
@@ -88,27 +88,23 @@ app.get("/proxy/maps", async (req, res) => {
   }
 });
 
-// Serve the Google Maps API script via proxy (simplified for Vercel)
+// Health check endpoint
+app.get("/health", (req, res) => {
+  res.status(200).json({ status: "OK", message: "Server is running" });
+});
+
+// Serve the Google Maps API script via proxy
 app.get("/api/maps", async (req, res) => {
-  const callback = req.query.callback || "initializeMap";
-  
-  if (!API_KEY) {
-    return res.status(500).send("Google Maps API key not configured");
-  }
-
-  const basePath = "/maps/api/js";
-  const params = `key=${API_KEY}&callback=${callback}`;
-  const signedUrl = generateSignedUrl(`${basePath}?${params}`, SIGNING_SECRET);
-
   try {
-    const response = await fetch(`https://maps.googleapis.com${signedUrl}`);
-    if (!response.ok) {
-      throw new Error("Failed to fetch Maps API script");
-    }
+    const callback = req.query.callback || "initializeMap";
+    // Use local proxy endpoint instead of external URL
+    const response = await fetch(
+      `${proxyURL}/proxy/maps?callback=${callback}`
+    );
     const script = await response.text();
     res.type("application/javascript").send(script);
   } catch (error) {
-    console.error("Error fetching Maps API script:", error);
+    console.error("Error fetching Maps API script via proxy:", error);
     res.status(500).send("Internal server error.");
   }
 });
@@ -139,9 +135,8 @@ app.get("/api/streetview", async (req, res) => {
     console.log(`🔍 Validating Street View for: ${lat}, ${lon}`);
     
     try {
-      // Use local proxy endpoint for validation
       const response = await fetch(
-        `${req.protocol}://${req.get('host')}/proxy/streetview?location=${lat},${lon}`
+        `${proxyURL}/proxy/streetview?location=${lat},${lon}`
       );
       
       console.log(`📊 Response status: ${response.status}`);
@@ -169,7 +164,7 @@ app.get("/api/streetview", async (req, res) => {
     const maxPoints = 10;
     const maxAttempts = 20; // Prevent infinite loops
 
-    // Fallback coordinates in case validation fails
+    // Fallback coordinates in case proxy server fails or no valid points found
     const fallbackCoords = [
       { lat: 28.6139, lon: 77.2090, city: "Delhi" },
       { lat: 19.0760, lon: 72.8777, city: "Mumbai" },
@@ -182,6 +177,18 @@ app.get("/api/streetview", async (req, res) => {
       { lat: 26.9124, lon: 75.7873, city: "Jaipur" },
       { lat: 26.8467, lon: 80.9462, city: "Lucknow" }
     ];
+
+    // Check if proxy server is accessible
+    try {
+      const testResponse = await fetch(`${proxyURL}/health`, { timeout: 5000 });
+      if (!testResponse.ok) {
+        console.log("⚠️  Proxy server not accessible, using fallback coordinates");
+        return fallbackCoords.slice(0, maxPoints);
+      }
+    } catch (error) {
+      console.log("⚠️  Proxy server error, using fallback coordinates:", error.message);
+      return fallbackCoords.slice(0, maxPoints);
+    }
 
     let attempts = 0;
     while (points.length < maxPoints && attempts < maxAttempts) {
@@ -217,5 +224,3 @@ const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
-
-module.exports = app;

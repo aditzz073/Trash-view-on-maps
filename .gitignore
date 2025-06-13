@@ -12,3 +12,4 @@ proxy/.env
 
 # OS generated files
 .DS_Store
+.vercel
